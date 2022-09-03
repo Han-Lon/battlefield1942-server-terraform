@@ -22,6 +22,8 @@ module "bf1942-server-iam-role" {
   source = "registry.terraform.io/terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.3.1"
 
+  role_name = "bf1942-server-iam-role"
+
   trusted_role_services = ["ec2.amazonaws.com"]
   create_role = true
   create_instance_profile = true

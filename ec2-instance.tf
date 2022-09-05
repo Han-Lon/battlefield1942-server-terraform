@@ -14,6 +14,7 @@ data "aws_ami" "ubuntu-ami" {
   }
 }
 
+# TODO put this in SSM Param Store
 resource "random_password" "initial-user-password" {
   length = 30
 }

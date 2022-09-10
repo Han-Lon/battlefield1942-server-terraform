@@ -43,7 +43,7 @@ resource "azurerm_network_security_group" "bf1942-security-group" {
     priority  = 100
     protocol  = "*"
     source_port_range = "*"
-    source_address_prefix = var.allowed-ssh-ip == "" ? "*" : "${data.http.my-ip.body}/32"
+    source_address_prefix = var.allowed-ssh-ip == null ? "*" : "${data.http.my-ip.body}/32"
     destination_port_range = "14567"
     destination_address_prefix = "*"
   }

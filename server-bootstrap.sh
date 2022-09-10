@@ -18,4 +18,6 @@ wget -O ~/linuxgsm.sh https://linuxgsm.sh \
 
 # Set the serverContentCheck in serversettings.con to false. The content check can cause issues if you have ANY differences in your local installation (e.g. mods)
 sed -i 's/game.serverContentCheck 1/game.serverContentCheck 0/' ~/serverfiles/mods/bf1942/settings/serversettings.con
+
+~/bf1942server start
 EOF

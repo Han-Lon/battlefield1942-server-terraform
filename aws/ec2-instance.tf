@@ -45,6 +45,8 @@ resource "aws_spot_instance_request" "bf1942-spot-server" {
   subnet_id = var.use-default-vpc == true ? aws_default_subnet.default-subnet[0].id : module.bf1942-vpc.public_subnets[0]
   iam_instance_profile = module.bf1942-server-iam-role.iam_instance_profile_id
 
+  security_groups = [aws_security_group.bf1942-server-security-group.id]
+
   root_block_device {
     volume_size = var.ec2-volume-size
   }

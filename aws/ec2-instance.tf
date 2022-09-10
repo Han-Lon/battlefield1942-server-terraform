@@ -50,7 +50,7 @@ resource "aws_spot_instance_request" "bf1942-spot-server" {
     volume_size = var.ec2-volume-size
   }
 
-  user_data = templatefile("${path.module}/server-bootstrap.sh", {
+  user_data = templatefile("../server-bootstrap.sh", {
     PASSWD = random_password.initial-user-password.result
   })
 }

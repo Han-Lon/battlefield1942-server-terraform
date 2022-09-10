@@ -1,18 +1,4 @@
 #!/bin/bash
-# Restore default APT repositories for Ubuntu 20.04 Focal -- per this SO thread https://askubuntu.com/a/1367041
-#cat <<EOF | sudo tee /etc/apt/sources.list
-#deb http://archive.ubuntu.com/ubuntu/ focal main universe multiverse restricted
-#deb http://security.ubuntu.com/ubuntu/ focal-security main universe multiverse restricted
-#deb http://archive.ubuntu.com/ubuntu/ focal-updates main universe multiverse restricted
-#deb http://archive.ubuntu.com/ubuntu/ focal-backports main universe multiverse restricted
-#
-#deb-src http://archive.ubuntu.com/ubuntu/ focal main universe multiverse restricted
-#deb-src http://security.ubuntu.com/ubuntu/ focal-security main universe multiverse restricted
-#deb-src http://archive.ubuntu.com/ubuntu/ focal-updates main universe multiverse restricted
-#deb-src http://archive.ubuntu.com/ubuntu/ focal-backports main universe multiverse restricted
-#EOF
-
-# TODO try this instead, might be better than the multiline above
 add-apt-repository universe
 
 export DEBIAN_FRONTEND=noninteractive
@@ -30,4 +16,6 @@ wget -O ~/linuxgsm.sh https://linuxgsm.sh \
 && bash ~/linuxgsm.sh bf1942server \
 && /usr/bin/yes | ~/bf1942server install
 
+# Set the serverContentCheck in serversettings.con to false. The content check can cause issues if you have ANY differences in your local installation (e.g. mods)
+sed -i 's/game.serverContentCheck 1/game.serverContentCheck 0/' ~/serverfiles/mods/bf1942/settings/serversettings.con
 EOF

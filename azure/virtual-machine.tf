@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "bf1942-server-rg" {
 
 # Use a spot virtual machine if the use-spot-instance variable is set to true. These are cheaper than regular, but can be terminated by Azure
 resource "azurerm_linux_virtual_machine" "bf1942-spot-server" {
-  count = var.use-spot-instance == true ? 1 : 0
+  count = var.use-spot-instance ? 1 : 0
   name                  = "battlefield1942-server"
 
   location              = azurerm_resource_group.bf1942-server-rg.location
@@ -46,7 +46,7 @@ resource "azurerm_linux_virtual_machine" "bf1942-spot-server" {
 
 # Launch a regular virtual machine if use-spot-instance is set to false
 resource "azurerm_linux_virtual_machine" "bf1942-server" {
-  count = var.use-spot-instance == true ? 0 : 1
+  count = !var.use-spot-instance ? 0 : 1
   name                  = "battlefield1942-server"
 
   location              = azurerm_resource_group.bf1942-server-rg.location
@@ -80,5 +80,5 @@ resource "azurerm_linux_virtual_machine" "bf1942-server" {
 
 # Output how to connect to the server based on which server type was deployed
 output "spot-instance-admin-password" {
-  value = var.use-spot-instance ? "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-spot-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}" : "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}"
+  value = var.use-spot-instance ? "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-spot-server[0].public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}" : "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-server[0].public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}"
 }

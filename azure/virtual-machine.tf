@@ -46,7 +46,7 @@ resource "azurerm_linux_virtual_machine" "bf1942-spot-server" {
 
 # Launch a regular virtual machine if use-spot-instance is set to false
 resource "azurerm_linux_virtual_machine" "bf1942-server" {
-  count = !var.use-spot-instance ? 0 : 1
+  count = !var.use-spot-instance ? 1 : 0
   name                  = "battlefield1942-server"
 
   location              = azurerm_resource_group.bf1942-server-rg.location

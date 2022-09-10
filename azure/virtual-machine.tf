@@ -2,17 +2,14 @@ resource "random_string" "initial-password" {
   length = 8
 }
 
-# TODO add a flag to determine if only local IP is used (won't work with Terraform Cloud)
-data "http" "my-ip" {
-  url = "https://ipv4.rawrify.com/ip"
-}
-
 resource "azurerm_resource_group" "bf1942-server-rg" {
-  location = "Central US"  # Swap this out for another region closer to you if you want -> https://azure.microsoft.com/en-us/global-infrastructure/geographies/#overview
+  location = var.azure-region
   name     = "battlefield1942"
 }
 
-resource "azurerm_linux_virtual_machine" "bf1942-server" {
+# Use a spot virtual machine if the use-spot-instance variable is set to true. These are cheaper than regular, but can be terminated by Azure
+resource "azurerm_linux_virtual_machine" "bf1942-spot-server" {
+  count = var.use-spot-instance == true ? 1 : 0
   name                  = "battlefield1942-server"
 
   location              = azurerm_resource_group.bf1942-server-rg.location
@@ -24,7 +21,6 @@ resource "azurerm_linux_virtual_machine" "bf1942-server" {
 
   priority = "Spot"
   eviction_policy = "Deallocate"
-  max_bid_price = "0.03"  # TODO find a way to dynamically determine this
 
   admin_username = "battlefieldroot"
   admin_password = random_string.initial-password.result
@@ -48,6 +44,47 @@ resource "azurerm_linux_virtual_machine" "bf1942-server" {
   }
 }
 
-output "instance-admin-password" {
+# Launch a regular virtual machine if use-spot-instance is set to false
+resource "azurerm_linux_virtual_machine" "bf1942-server" {
+  count = var.use-spot-instance == true ? 0 : 1
+  name                  = "battlefield1942-server"
+
+  location              = azurerm_resource_group.bf1942-server-rg.location
+  resource_group_name = azurerm_resource_group.bf1942-server-rg.name
+
+  network_interface_ids = [
+    azurerm_network_interface.bf1942-network-interface.id
+  ]
+
+  admin_username = "battlefieldroot"
+  admin_password = random_string.initial-password.result
+  disable_password_authentication = false
+
+  custom_data = base64encode(templatefile("../server-bootstrap.sh", {
+    PASSWD = random_string.initial-password.result
+  }))
+
+  size                  = "Standard_D2s_v3"
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
+    version   = "latest"
+  }
+}
+
+# Output how to connect to the server based on which server type was deployed
+output "spot-instance-admin-password" {
+  count = var.use-spot-instance == true ? 1 : 0
+  value = "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-spot-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}"
+}
+
+output "regular-instance-admin-password" {
+  count = var.use-spot-instance == true ? 0 : 1
   value = "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}"
 }

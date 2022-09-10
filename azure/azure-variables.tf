@@ -9,3 +9,9 @@ variable "use-spot-instance" {
   type = bool
   default = false
 }
+
+variable "azure-region" {
+  description = "The Azure region to deploy infrastructure into. Defaults to Central US since it's really cheap. Swap this out for another region closer to you if you want -> https://azure.microsoft.com/en-us/global-infrastructure/geographies/#overview"
+  type = string
+  default = "Central US"
+}

@@ -80,11 +80,5 @@ resource "azurerm_linux_virtual_machine" "bf1942-server" {
 
 # Output how to connect to the server based on which server type was deployed
 output "spot-instance-admin-password" {
-  count = var.use-spot-instance == true ? 1 : 0
-  value = "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-spot-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}"
-}
-
-output "regular-instance-admin-password" {
-  count = var.use-spot-instance == true ? 0 : 1
-  value = "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}"
+  value = var.use-spot-instance ? "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-spot-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}" : "You can SSH into the host at IP ${azurerm_linux_virtual_machine.bf1942-server.public_ip_address} with username battlefieldroot and password ${random_string.initial-password.result}"
 }
